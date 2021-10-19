@@ -11,6 +11,7 @@ import hashlib
 app=Flask(__name__)
 app.secret_key= os.urandom(24)
 
+rbd="vacunacion.db"
 #api para registrar los usuarios
 @app.route("/registro",methods=["GET","POST"])
 def registrar():
@@ -24,7 +25,7 @@ def registrar():
         encrip = hashlib.sha256(password.encode('utf-8'))
         pass_enc = encrip.hexdigest()
         #conecta a la base de datos
-        with sqlite3.connect("vacunacion.db") as con:
+        with sqlite3.connect(rbd) as con:
             # crea un cursor para manipular la base de datos
             cur=con.cursor()
             #prepara sentencia SQL, preferiblemente no concatenar
@@ -45,7 +46,7 @@ def home():
         encrip = hashlib.sha256(password.encode('utf-8'))
         pass_enc = encrip.hexdigest()
         #conecta a la base de datos
-        with sqlite3.connect("vacunacion.db") as con:
+        with sqlite3.connect(rbd) as con:
             con.row_factory = sqlite3.Row
             cur=con.cursor()
             cur.execute("SELECT * FROM usuarios WHERE username =? AND password=?",[username,pass_enc])
@@ -65,7 +66,7 @@ def home():
 
 @app.route("/usuario/listar",methods=["GET","POST"])
 def usuario_listar():
-    with sqlite3.connect("vacunacion.db") as con:
+    with sqlite3.connect(rbd) as con:
         con.row_factory=sqlite3.Row #vista de diccionario
         cur=con.cursor()
         cur.execute("SELECT * FROM usuarios")
@@ -78,7 +79,7 @@ def eliminar():
 
     if request.method=="POST":
         username=frm.username.data
-        with sqlite3.connect("vacunacion.db") as con:
+        with sqlite3.connect(rbd) as con:
             cur=con.cursor()
             cur.execute("DELETE FROM usuarios WHERE username=?",[username])
             con.commit()
@@ -105,7 +106,7 @@ def prod_save():
     if len(nombre) > 0:
         if len(precio) > 0:
             if len(stock) > 0:
-                with sqlite3.connect("vacunacion.db") as con:
+                with sqlite3.connect(rbd) as con:
                     cur = con.cursor()
                     cur.execute("INSERT INTO productos (nombre,precio,stock) VALUES (?,?,?)", [
                                 nombre, precio, stock])
@@ -125,7 +126,7 @@ def prod_get():
     frm=Productos()
     codigo=frm.codigo.data
     if len(codigo)>0:
-        with sqlite3.connect("vacunacion.db") as con:
+        with sqlite3.connect(rbd) as con:
             con.row_factory=sqlite3.Row #lista de diccionario
             cur = con.cursor()
             cur.execute("SELECT * from productos WHERE codigo=?",[codigo])
@@ -147,7 +148,7 @@ def prod_delete():
     frm = Productos()
     codigo = escape(frm.codigo.data)
     if codigo:
-        with sqlite3.connect("vacunacion.db") as con:
+        with sqlite3.connect(rbd) as con:
             cur = con.cursor()
             cur.execute("DELETE FROM productos WHERE codigo = ?", [codigo])
             con.commit()
