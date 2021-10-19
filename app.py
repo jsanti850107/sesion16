@@ -119,7 +119,7 @@ def prod_save():
         flash("ERROR: Nombre es requerido")
 
     return render("productos.html", frm=frm)
-
+#dfsdfsd
 @app.route("/producto/get",methods=["POST"])
 def prod_get():
     frm=Productos()
